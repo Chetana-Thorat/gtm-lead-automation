@@ -1,0 +1,44 @@
+.navbar {
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  background-color: #990000; /* IU Crimson */
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-logo {
+  font-size: 1.9rem;
+  font-weight: bold;
+  letter-spacing: 0.6px;
+  color: white;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.navbar-links li a:hover {
+  color: #FFD700; /* Gold accent (brighter) */
+  border-bottom: 2px solid #FFD700;
+}

@@ -1,0 +1,110 @@
+/* Full Page Layout */
+.publications-split-page {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  /* Left Panel */
+  .publications-left-panel {
+    background-color: #990000; /* IU Crimson */
+    color: white;
+    padding: 4rem 2rem;
+    flex: 1;
+    min-width: 280px;
+    max-width: 360px;
+  }
+  
+  .publications-left-panel h1 {
+    font-size: 2.6rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .publications-subtext {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #f2f2f2;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem 1.2rem;
+    border-left: 4px solid #ffcc00;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-style: italic;
+  }
+  
+  /* Right Panel */
+  .publications-right-panel {
+    flex: 2;
+    padding: 3rem 2rem;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  /* Publication Cards Section */
+  .publication-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .publication-card {
+    background: #ffffff;
+    border-left: 6px solid #990000;
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .publication-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .publication-card h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .publication-card p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0.3rem 0;
+  }
+  
+  /* Link Button */
+  .read-link {
+    margin-top: 1rem;
+    display: inline-block;
+    background-color: #990000;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+  
+  .read-link:hover {
+    background-color: #660000;
+  }
+  
+  /* Responsive Tweaks */
+  @media (max-width: 768px) {
+    .publications-split-page {
+      flex-direction: column;
+    }
+  
+    .publications-left-panel,
+    .publications-right-panel {
+      max-width: 100%;
+    }
+  
+    .publications-left-panel {
+      text-align: center;
+    }
+  }
+  

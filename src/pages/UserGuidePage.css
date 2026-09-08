@@ -1,0 +1,194 @@
+/* ===== SECTION 1: User Guide Overview (IU Themed) ===== */
+
+.user-guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  min-height: 100vh;
+  background-color: #990000; /* IU Red */
+  font-family: 'Georgia', serif;
+  color: white;
+}
+
+.left-panel {
+  background-color: #990000;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: left;
+}
+
+.left-panel h1 {
+  font-size: 2.8rem;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.left-panel .date {
+  font-size: 1rem;
+  opacity: 0.85;
+  margin-bottom: 1.2rem;
+}
+
+.download-button {
+  display: inline-block;
+  padding: 0.5rem 1.2rem;
+  background-color: white;
+  color: #990000;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  width: fit-content;
+  border: none;
+  cursor: pointer;
+}
+
+.download-button:hover {
+  background-color: #d9d9d9;
+  color: #000;
+}
+
+.right-panel {
+  background-color: #f8f8f8;
+  padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.info-card {
+  background: white;
+  border-radius: 4px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, opacity 0.6s ease;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.info-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+.info-card h3 {
+  margin-bottom: 0.7rem;
+  color: #990000;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.info-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.info-card a {
+  color: #0056b3;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+/* ===== SECTION 2: Fields in DEV-CaMP ===== */
+
+.user-guide-fields-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  background-color: #f8f8f8;
+  padding: 4rem 2.5rem;
+  gap: 2rem;
+}
+
+.fields-left-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.field-box {
+  background: white;
+  border-radius: 4px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.field-box.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.field-box:hover {
+  transform: translateY(-4px);
+}
+
+.field-box h4 {
+  margin-bottom: 0.7rem;
+  font-size: 1.05rem;
+  color: #990000;
+  font-weight: bold;
+}
+
+.field-box p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #222;
+}
+
+.fields-right-panel {
+  background-color: #990000;
+  color: white;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.fields-right-panel h2 {
+  font-size: 2.3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.fields-right-panel p {
+  font-size: 1rem;
+  line-height: 1.7;
+  opacity: 0.95;
+}
+
+.visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.back-button {
+  margin-top: 2rem;
+  padding: 0.5rem 1.2rem;
+  background-color: white;
+  color: #990000;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  width: fit-content;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #e1e1e1;
+  color: #000;
+}
