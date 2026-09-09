@@ -1,0 +1,223 @@
+{
+  "name": "DEV-CaMP - Inbound Dataset Lead",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "devcamp-dataset-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "f8664f34-ce0d-43df-984a-8589346f7af6",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "companyName": "={{ $json.organization }}",
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "fit_score",
+                "value": "={{ $json.fit_score }}"
+              },
+              {
+                "property": "intent_score",
+                "value": "={{ $json.intent_score }}"
+              },
+              {
+                "property": "total_score",
+                "value": "={{ $json.total_score }}"
+              },
+              {
+                "property": "priority",
+                "value": "={{ $json.priority }}"
+              }
+            ]
+          },
+          "firstName": "={{ $json.name.split(' ')[0] }}",
+          "lastName": "={{ $json.name.split(' ').slice(1).join(' ') }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        -16
+      ],
+      "id": "6cd5647a-e29c-42dc-a4c1-bc2c5d58fb16",
+      "name": "Create or update a contact"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the lead submitted from the website.\nconst lead = $json.body;\n\n// Start the intent score.\nlet intentScore = 0;\n\n// A dataset download is our strongest current conversion signal.\nif (lead.conversion === 'dataset_download') {\n  intentScore += 40;\n}\n\n// Start the fit score.\nlet fitScore = 0;\n\nconst fitReasons = [];\n\n// Give points when the visitor provides an organization.\nif (lead.organization && lead.organization.trim() !== '') {\n  fitScore += 20;\n  fitReasons.push('Organization provided');\n}\n\n// Check whether the organization appears to be in a relevant sector.\nconst organization = (lead.organization || '').toLowerCase();\n\nconst targetKeywords = [\n  'mining',\n  'minerals',\n  'energy',\n  'battery',\n  'research',\n  'university',\n  'government'\n];\n\nconst matchesTargetSector = targetKeywords.some(\n  keyword => organization.includes(keyword)\n);\n\nif (matchesTargetSector) {\n  fitScore += 30;\n  fitReasons.push('Organization matches a target sector');\n}\n\n// Give a small signal for a professional email domain.\nconst email = (lead.email || '').toLowerCase();\n\nconst freeEmailDomains = [\n  'gmail.com',\n  'yahoo.com',\n  'hotmail.com',\n  'outlook.com'\n];\n\nconst emailDomain = email.includes('@')\n  ? email.split('@')[1]\n  : '';\n\nif (\n  emailDomain &&\n  !freeEmailDomains.includes(emailDomain)\n) {\n  fitScore += 10;\n  fitReasons.push('Professional email domain');\n}\n\n// Keep the final score between 0 and 100.\nconst totalScore = Math.min(\n  intentScore + fitScore,\n  100\n);\n\n// Convert the score into a simple priority.\nlet priority = 'LOW';\n\nif (totalScore >= 70) {\n  priority = 'HIGH';\n} else if (totalScore >= 40) {\n  priority = 'MEDIUM';\n}\n\n// Return the original lead plus the scoring results.\nreturn [\n  {\n    json: {\n      ...lead,\n      intent_score: intentScore,\n      fit_score: fitScore,\n      total_score: totalScore,\n      priority: priority,\n      fit_reasons: fitReasons\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "9b34b0c1-465b-4ff6-a272-f88001bdcff0",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5.4-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are helping a GTM team review an inbound lead.\n\nWrite a concise 2-3 sentence lead summary using only the information provided below. Do not invent any information.\n\nLead:\nName: {{ $('Code in JavaScript').item.json.name }}\nEmail: {{ $('Code in JavaScript').item.json.email }}\nOrganization: {{ $('Code in JavaScript').item.json.organization }}\nConversion: {{ $('Code in JavaScript').item.json.conversion }}\nDownloaded resource: {{ $('Code in JavaScript').item.json.resource_name }}\n\nQualification:\nIntent score: {{ $('Code in JavaScript').item.json.intent_score }}\nFit score: {{ $('Code in JavaScript').item.json.fit_score }}\nTotal score: {{ $('Code in JavaScript').item.json.total_score }}\nPriority: {{ $('Code in JavaScript').item.json.priority }}\nFit reasons: {{ $('Code in JavaScript').item.json.fit_reasons.join(', ') }}\n\nExplain why the lead received this priority and give one short recommended next action."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        928,
+        -32
+      ],
+      "id": "e9bc14f1-fa41-44f4-a316-fa2b6618f014",
+      "name": "Message a model"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4f1a2bda-a243-4481-85a3-e81b0750fc33",
+              "leftValue": "={{ $('Code in JavaScript').item.json.priority }}",
+              "rightValue": "HIGH",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        688,
+        -16
+      ],
+      "id": "d1926e39-3ba3-47d1-849b-bc24fa59222d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "=#gtm-lead-alerts",
+          "mode": "id"
+        },
+        "text": "=\ud83d\udea8 HIGH PRIORITY INBOUND LEAD  Name: {{ $('Code in JavaScript').item.json.name }} Email: {{ $('Code in JavaScript').item.json.email }} Organization: {{ $('Code in JavaScript').item.json.organization }}  Fit Score: {{ $('Code in JavaScript').item.json.fit_score }} Intent Score: {{ $('Code in JavaScript').item.json.intent_score }} Total Score: {{ $('Code in JavaScript').item.json.total_score }} Priority: {{ $('Code in JavaScript').item.json.priority }}  Qualification Signals: {{ $('Code in JavaScript').item.json.fit_reasons.join(', ') }}  AI Summary: {{ $('Message a model').item.json.output[0].content[0].text }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1296,
+        -32
+      ],
+      "id": "5a9e4ee4-bd12-4350-ad5d-6d0e0ee433fd",
+      "name": "Send a message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a contact": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create or update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
