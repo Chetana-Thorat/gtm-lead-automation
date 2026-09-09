@@ -693,4 +693,69 @@ Website
   -> Slack Alert
 ```
 
-The repository uses synthetic/test leads for demonstrations and does not claim production revenue, pipeline, or conversion impact.
+## Challenges & What I Learned
+
+Building the workflow involved several practical integration problems that changed the final design.
+
+### 1. Tracking navigation in a React single-page application
+
+**Challenge:**  
+The website uses React Router, so moving between mineral project pages does not always trigger a normal browser page reload. Traditional page-view tracking alone would miss some navigation.
+
+**Solution:**  
+I used GTM History Change tracking and dynamic path values to capture project-level navigation and generate the `mineral_detail_view` event.
+
+**What I learned:**  
+Tracking a single-page application requires monitoring route changes, not only traditional page loads.
+
+---
+
+### 2. Keeping personal information out of GA4
+
+**Challenge:**  
+The dataset form needs a name and email for CRM follow-up, but that information should not be sent to GA4.
+
+**Solution:**  
+I separated the two data flows. The lead details are sent to n8n and HubSpot, while GTM/GA4 receives only conversion metadata such as the event name, resource, source, and whether an organization was provided.
+
+**What I learned:**  
+Analytics data and CRM lead data should have different data contracts instead of sending the same payload to every system.
+
+---
+
+### 3. Choosing a lead-scoring approach without historical conversion data
+
+**Challenge:**  
+The project did not have historical lead-to-opportunity data that could be used to train or properly calibrate a predictive scoring model.
+
+**Solution:**  
+I used simple deterministic rules based on observable fit and intent signals. This made every score easy to explain and test.
+
+**What I learned:**  
+A simple rule-based system can be more appropriate than an AI model when there is not enough historical data to support a reliable predictive approach.
+
+---
+
+### 4. Separating lead qualification from AI
+
+**Challenge:**  
+Using an LLM to decide whether a lead is HIGH or LOW priority would make the decision harder to explain and could produce inconsistent results.
+
+**Solution:**  
+I kept qualification deterministic. The workflow calculates fit, intent, total score, and priority first. OpenAI is called only after a lead has already been classified as HIGH priority.
+
+**What I learned:**  
+AI is more useful here for summarizing structured evidence than for replacing clear business rules.
+
+---
+
+### 5. Mapping custom HubSpot properties through n8n
+
+**Challenge:**  
+The scoring values existed in n8n, but they needed dedicated HubSpot contact properties before they could be stored in the CRM. The Priority dropdown also initially rejected the value because its allowed options were not configured correctly.
+
+**Solution:**  
+I created custom HubSpot properties for Fit Score, Intent Score, Total Score, and Priority, then configured the Priority dropdown with matching LOW, MEDIUM, and HIGH values before mapping the n8n output.
+
+**What I learned:**  
+CRM integrations depend not only on sending the right value but also on matching the CRM property's field type and allowed values.
