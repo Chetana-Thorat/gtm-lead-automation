@@ -4,6 +4,20 @@ An end-to-end GTM engineering project that turns website engagement and dataset 
 
 The system tracks website behavior with Google Tag Manager and GA4, captures users who download the DEV-CaMP dataset, sends the lead to n8n, calculates deterministic fit and intent scores, stores the qualified lead in HubSpot, and routes high-priority leads through an AI-generated summary to Slack.
 
+## Workflow Walkthrough
+
+https://github.com/user-attachments/assets/a916703c-8ac2-40a4-81ae-aafdc8c9853d
+
+## Tech Stack
+
+- **Website tracking:** Google Tag Manager, GA4
+- **Workflow automation:** n8n
+- **CRM:** HubSpot
+- **AI:** OpenAI
+- **Notifications:** Slack
+- **Data / scoring:** JavaScript, deterministic fit and intent scoring
+- **Integration:** Webhooks, APIs
+
 ---
 
 ## Business Problem
