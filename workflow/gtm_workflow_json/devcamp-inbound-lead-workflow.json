@@ -1,0 +1,56 @@
+{
+  "name": "devcamp-inbound-lead-workflow",
+  "type": "workflow-reconstruction",
+  "source": "reconstructed from provided workflow screenshots and execution output",
+  "note": "Not an official n8n export. Use the actual n8n export as the source of truth for importing back into n8n.",
+  "trigger": {
+    "type": "webhook",
+    "method": "POST",
+    "path": "/webhook/devcamp-dataset-lead"
+  },
+  "input_schema": {
+    "name": "string",
+    "email": "string",
+    "organization": "string",
+    "source": "string",
+    "conversion": "string",
+    "resource_name": "string"
+  },
+  "steps": [
+    {
+      "name": "Webhook",
+      "purpose": "Receive inbound website submission"
+    },
+    {
+      "name": "JavaScript normalization",
+      "purpose": "Normalize incoming lead fields"
+    },
+    {
+      "name": "Clay enrichment",
+      "purpose": "Enrich lead/company information"
+    },
+    {
+      "name": "Deterministic scoring",
+      "purpose": "Calculate fit, intent, total score, priority, and explainable reasons"
+    },
+    {
+      "name": "HubSpot",
+      "purpose": "Write qualified lead and scoring context to CRM"
+    }
+  ],
+  "observed_output_example": {
+    "name": "Sarah Williams",
+    "email": "sarah.williams@westernresearchtest.edu",
+    "organization": "Western Research Institute",
+    "source": "website",
+    "conversion": "dataset_download",
+    "resource_name": "DEV-CaMP Dataset",
+    "domain": "westernresearch.org",
+    "industry": "research services",
+    "employee_count": 0,
+    "fit_score": 40,
+    "intent_score": 40,
+    "total_score": 80,
+    "priority": "HIGH"
+  }
+}

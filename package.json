@@ -21,11 +21,13 @@
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
   },
+  
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev": "./scripts/dev.sh"
   },
   "eslintConfig": {
     "extends": [
@@ -45,4 +47,5 @@
       "last 1 safari version"
     ]
   }
+  
 }

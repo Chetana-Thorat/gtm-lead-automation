@@ -1,0 +1,62 @@
+{
+  "name": "ai-agent-workflow",
+  "type": "workflow-reconstruction",
+  "source": "reconstructed from provided workflow screenshots and interview discussion",
+  "note": "Not an official n8n export. Use the actual n8n export as the source of truth for importing back into n8n.",
+  "trigger": {
+    "type": "webhook",
+    "method": "POST"
+  },
+  "entry_condition": {
+    "field": "priority",
+    "operator": "equals",
+    "value": "HIGH"
+  },
+  "steps": [
+    {
+      "name": "Webhook",
+      "purpose": "Receive a high-priority lead context"
+    },
+    {
+      "name": "JavaScript normalization",
+      "purpose": "Prepare lead fields for the AI workflow"
+    },
+    {
+      "name": "HubSpot context",
+      "purpose": "Provide CRM context for the lead"
+    },
+    {
+      "name": "AI Agent",
+      "purpose": "Generate a structured lead summary and recommend the next GTM action"
+    },
+    {
+      "name": "OpenAI Chat Model",
+      "purpose": "Provide the language model used by the Agent"
+    },
+    {
+      "name": "Search Contacts tool",
+      "purpose": "Retrieve contact context when needed"
+    },
+    {
+      "name": "Slack tool",
+      "purpose": "Send review or communication content"
+    },
+    {
+      "name": "Gmail draft",
+      "purpose": "Prepare personalized outreach draft"
+    },
+    {
+      "name": "Human approval",
+      "purpose": "Require approval before external outreach"
+    },
+    {
+      "name": "Gmail send",
+      "purpose": "Send approved external email"
+    }
+  ],
+  "design_constraints": [
+    "AI does not determine the original LOW/MEDIUM/HIGH priority.",
+    "Human approval is required before external outreach.",
+    "AI recommendations should be based on verified lead and CRM context."
+  ]
+}

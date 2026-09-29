@@ -1,67 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import './HomePage.css';
-import { HashLink } from 'react-router-hash-link';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const customIcon = new L.Icon({
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+import './HomePage.css';
+
+import { HashLink } from 'react-router-hash-link';
+
+import 'leaflet/dist/leaflet.css';
+
+
+// ============================================================
+// Glossary data
+// ============================================================
 
 const glossary = [
   {
     term: "Project Description",
-    definition: "A critical mineral used in electric vehicle batteries and energy storage systems."
+    definition:
+      "A critical mineral used in electric vehicle batteries and energy storage systems."
   },
   {
     term: "Location Information",
-    definition: "Describes the development phase: Exploration, Development, Active, etc."
+    definition:
+      "Describes the development phase: Exploration, Development, Active, etc."
   },
   {
     term: "Developer Description",
-    definition: "Indicates whether the mineral project is on public, private, or mixed land."
+    definition:
+      "Indicates whether the mineral project is on public, private, or mixed land."
   },
   {
     term: "Development Plans",
-    definition: "The initial stage of a mining project, involving surveys and assessments."
+    definition:
+      "The initial stage of a mining project, involving surveys and assessments."
   },
   {
     term: "Financial Support",
-    definition: "Minerals essential to the economy and national security, with vulnerable supply chains."
+    definition:
+      "Minerals essential to the economy and national security, with vulnerable supply chains."
   },
   {
     term: "Land Ownership",
-    definition: "A group of 17 chemically similar elements used in high-tech devices, defense, and clean energy."
+    definition:
+      "A group of 17 chemically similar elements used in high-tech devices, defense, and clean energy."
   },
   {
     term: "Litigation Information",
-    definition: "A group of 17 chemically similar elements used in high-tech devices, defense, and clean energy."
+    definition:
+      "A group of 17 chemically similar elements used in high-tech devices, defense, and clean energy."
   }
 ];
+
+
+// ============================================================
+// Team data
+// ============================================================
 
 const teamMembers = [
   {
     name: "John D. Graham",
     role: "Principal Investigator, Professor",
     image: "/images/john.jpg",
-    link: "https://oneill.indiana.edu/faculty-research/directory/profiles/faculty/full-time/graham-john.html"
+    link:
+      "https://oneill.indiana.edu/faculty-research/directory/profiles/faculty/full-time/graham-john.html"
   },
   {
     name: "John A. Rupp ",
     role: "Professor",
     image: "/images/rupp.jpg",
-    link: "https://oneill.indiana.edu/faculty-research/directory/profiles/faculty/full-time/rupp-john.html"
+    link:
+      "https://oneill.indiana.edu/faculty-research/directory/profiles/faculty/full-time/rupp-john.html"
   },
   {
     name: "Kelly Anderson",
@@ -95,27 +105,49 @@ const teamMembers = [
   }
 ];
 
+
+// ============================================================
+// Home Page
+// ============================================================
+
 function HomePage() {
+
   const navigate = useNavigate();
 
-  // Controls the dataset-request modal.
+
+  // ==========================================================
+  // Prospective student form state
+  // ==========================================================
+
   const [showDatasetForm, setShowDatasetForm] = useState(false);
 
-  // Stores the visitor's form values until the submission is completed.
   const [datasetForm, setDatasetForm] = useState({
     name: '',
     email: '',
-    organization: ''
+    intendedMajor: ''
   });
 
-  // Shows the successful submission state.
   const [datasetSubmitted, setDatasetSubmitted] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+
+  // ==========================================================
+  // Initialize page animations
+  // ==========================================================
+
   useEffect(() => {
-    AOS.init({ duration: 1000, once: true });
+    AOS.init({
+      duration: 1000,
+      once: true
+    });
   }, []);
 
-  // Opens the dataset request form.
+
+  // ==========================================================
+  // Open the form
+  // ==========================================================
+
   const handleDatasetClick = (e) => {
     e.preventDefault();
 
@@ -123,8 +155,13 @@ function HomePage() {
     setShowDatasetForm(true);
   };
 
-  // Updates the dataset form as the visitor types.
+
+  // ==========================================================
+  // Update form values
+  // ==========================================================
+
   const handleDatasetInputChange = (e) => {
+
     const { name, value } = e.target;
 
     setDatasetForm((prev) => ({
@@ -133,123 +170,215 @@ function HomePage() {
     }));
   };
 
-  // Starts the dataset download after the visitor submits the form.
-  // Sends the lead to n8n first, then starts the dataset download.
-const handleDatasetSubmit = async (e) => {
-  e.preventDefault();
 
-  const name = datasetForm.name.trim();
-  const email = datasetForm.email.trim();
-  const organization = datasetForm.organization.trim();
+  // ==========================================================
+  // Submit prospective student lead to n8n
+  // ==========================================================
 
-  if (!name || !email) {
-    return;
-  }
+  const handleDatasetSubmit = async (e) => {
 
-  // This contains the actual lead information.
-  const leadData = {
-    name: name,
-    email: email,
-    organization: organization,
-    source: 'website',
-    conversion: 'dataset_download',
-    resource_name: 'DEV-CaMP Dataset'
-  };
+    e.preventDefault();
 
-  try {
-    // Send the actual lead to our n8n workflow.
-    const response = await fetch(
-      'https://chthorat.app.n8n.cloud/webhook/devcamp-dataset-lead',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(leadData)
-      }
-    );
+    // Normalize basic user input.
+    const name = datasetForm.name.trim();
+    const email = datasetForm.email.trim().toLowerCase();
+    const intendedMajor = datasetForm.intendedMajor.trim();
 
-    if (!response.ok) {
-      throw new Error('Unable to save lead information.');
+
+    // Basic client-side validation.
+    if (!name || !email || !intendedMajor) {
+      return;
     }
 
-    // Send only non-PII analytics information to GTM / GA4.
-    window.dataLayer = window.dataLayer || [];
 
-    window.dataLayer.push({
-      event: 'dataset_request_submit',
-      resource_name: 'DEV-CaMP Dataset',
+    // This is the lead event that n8n will receive.
+    const inquiryEvent = {
+      eventId: crypto.randomUUID(),
+      occurredAt: new Date().toISOString(),
+      
+      name: name,
+      email: email,
+      intendedMajor: intendedMajor,
+
       source: 'website',
-      organization_provided: Boolean(organization)
-    });
 
-    // Download the dataset only after n8n accepts the request.
-    const downloadLink = document.createElement('a');
+      eventType: 'prospective_student_form_submitted'
+    };
 
-    downloadLink.href = '/DevCamp_new.xlsx';
-    downloadLink.download = 'DEV-CaMP-Dataset.xlsx';
 
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    try {
 
-    setDatasetSubmitted(true);
+      setIsSubmitting(true);
 
-  } catch (error) {
-    console.error('Dataset request failed:', error);
 
-    alert(
-      'We could not process your dataset request. Please try again.'
-    );
-  }
-};
+      // ======================================================
+      // IMPORTANT:
+      //
+      // Replace YOUR_N8N_TEST_WEBHOOK_URL with the Test URL
+      // generated by the n8n Webhook node.
+      //
+      // Example:
+      //
+      // https://your-instance.app.n8n.cloud/
+      // webhook-test/prospective-student-inquiry
+      // ======================================================
 
-  // Closes the dataset form and resets its state.
+      const response = await fetch(
+        'http://127.0.0.1:8000/api/v1/inquiries',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(inquiryEvent)
+        }
+      );
+
+
+      // If n8n does not return a successful HTTP status,
+      // treat the submission as failed.
+      if (!response.ok) {
+        throw new Error(
+          `Unable to submit inquiry. Status: ${response.status}`
+        );
+      }
+
+
+      // ======================================================
+      // Optional analytics event
+      //
+      // Do NOT send name/email into GA4/GTM.
+      // ======================================================
+
+      window.dataLayer = window.dataLayer || [];
+
+      window.dataLayer.push({
+        event: 'prospective_student_form_submitted',
+        source: 'website',
+        intended_major_provided: Boolean(intendedMajor)
+      });
+
+
+      // Show the success message.
+      setDatasetSubmitted(true);
+
+
+      // Clear the form after successful submission.
+      setDatasetForm({
+        name: '',
+        email: '',
+        intendedMajor: ''
+      });
+
+    } catch (error) {
+
+      console.error(
+        'Prospective student inquiry submission failed:',
+        error
+      );
+
+      alert(
+        'We could not submit your information. Please try again.'
+      );
+
+    } finally {
+
+      setIsSubmitting(false);
+
+    }
+  };
+
+
+  // ==========================================================
+  // Close and reset the form
+  // ==========================================================
+
   const closeDatasetForm = () => {
+
     setShowDatasetForm(false);
+
     setDatasetSubmitted(false);
+
+    setIsSubmitting(false);
 
     setDatasetForm({
       name: '',
       email: '',
-      organization: ''
+      intendedMajor: ''
     });
   };
 
+
+  // ==========================================================
+  // Page
+  // ==========================================================
+
   return (
+
     <div className="homepage">
 
-      <header className="hero" data-aos="fade-down">
-        <div className="hero-content">
-          <h1>Database of EV Critical Material Projects</h1>
 
-          <p>Unlock Critical Material Insights Across the U.S.</p>
+      {/* ======================================================
+          HERO SECTION
+      ====================================================== */}
+
+      <header className="hero" data-aos="fade-down">
+
+        <div className="hero-content">
+
+          <h1>
+            Database of EV Critical Material Projects
+          </h1>
+
+          <p>
+            Unlock Critical Material Insights Across the U.S.
+          </p>
 
           <div className="hero-buttons">
-            <button onClick={() => navigate('/map')}>
+
+            <button
+              onClick={() => navigate('/map')}
+            >
               Explore Interactive Map
             </button>
 
-            <button onClick={() => navigate('/projects')}>
+            <button
+              onClick={() => navigate('/projects')}
+            >
               Search Projects
             </button>
+
           </div>
+
         </div>
+
       </header>
 
+
+
+      {/* ======================================================
+          MAP PREVIEW
+      ====================================================== */}
 
       <section
         className="map-preview-horizontal"
         data-aos="fade-right"
       >
+
         <div className="map-preview-container">
 
+
           <div className="map-preview-text">
-            <h2>Mini Map Preview</h2>
+
+            <h2>
+              Mini Map Preview
+            </h2>
 
             <p>
-              Discover and interact with a visual snapshot of critical materials projects
-              across the U.S. Click below to explore the full interactive map with over 100+ projects.
+              Discover and interact with a visual snapshot of
+              critical materials projects across the U.S.
+              Click below to explore the full interactive map
+              with over 100+ projects.
             </p>
 
             <button
@@ -258,247 +387,442 @@ const handleDatasetSubmit = async (e) => {
             >
               Explore Full Map
             </button>
+
           </div>
 
+
           <div className="map-preview-map">
+
             <arcgis-embedded-map
+
               style={{
                 height: '100%',
                 width: '100%',
                 borderRadius: '20px',
                 overflow: 'hidden'
               }}
+
               item-id="a2f5f33bf0fe4d73b54ea3cc8fbd762b"
+
               portal-url="https://iu.maps.arcgis.com"
+
               theme="light"
-            ></arcgis-embedded-map>
+
+            >
+            </arcgis-embedded-map>
+
           </div>
 
         </div>
+
       </section>
 
 
-      {/* About Section */}
+
+      {/* ======================================================
+          ABOUT SECTION
+      ====================================================== */}
+
       <section
         className="about-section"
         id="about"
       >
+
         <h2 className="about-title">
           About DEV-CaMP
         </h2>
 
+
         <div className="about-grid">
 
+
           <div className="about-card">
-            <h3>What Is DEV-CaMP?</h3>
+
+            <h3>
+              What Is DEV-CaMP?
+            </h3>
 
             <p>
-              The <strong>Database of EV Critical Material Projects (DEV-CaMP)</strong> is a growing resource that tracks U.S. mining and associated processing projects for key materials used in electric vehicles, including lithium, copper, cobalt, neodymium, nickel, graphite, and manganese.
+
+              The{' '}
+
+              <strong>
+                Database of EV Critical Material Projects
+                (DEV-CaMP)
+              </strong>
+
+              {' '}is a growing resource that tracks U.S.
+              mining and associated processing projects for
+              key materials used in electric vehicles,
+              including lithium, copper, cobalt, neodymium,
+              nickel, graphite, and manganese.
+
             </p>
+
           </div>
 
+
           <div className="about-card">
-            <h3>Who Built It?</h3>
+
+            <h3>
+              Who Built It?
+            </h3>
 
             <p>
-              Our team — a working group established in <strong>2021</strong> at <strong>Indiana University’s Paul H. O’Neill School of Public and Environmental Affairs</strong> — brings together faculty, graduate students, and undergraduate researchers with an interest in the policy, permitting, funding, and development challenges facing the U.S. critical materials sector.
+
+              Our team — a working group established in{' '}
+
+              <strong>
+                2021
+              </strong>
+
+              {' '}at{' '}
+
+              <strong>
+                Indiana University’s Paul H. O’Neill School
+                of Public and Environmental Affairs
+              </strong>
+
+              {' '}— brings together faculty, graduate
+              students, and undergraduate researchers with
+              an interest in the policy, permitting, funding,
+              and development challenges facing the U.S.
+              critical materials sector.
+
             </p>
+
           </div>
 
+
           <div className="about-card">
-            <h3>Current Data & Updates</h3>
+
+            <h3>
+              Current Data & Updates
+            </h3>
 
             <p>
-              This release marks the <strong>first time the database has been made publicly available</strong>. The information reflects data collected through <strong>January 2025</strong>, and we plan to update the site on an annual basis as new projects emerge and existing sites progress.
+
+              This release marks the{' '}
+
+              <strong>
+                first time the database has been made publicly
+                available
+              </strong>.
+
+              {' '}The information reflects data collected
+              through{' '}
+
+              <strong>
+                January 2025
+              </strong>,
+
+              {' '}and we plan to update the site on an annual
+              basis as new projects emerge and existing sites
+              progress.
+
             </p>
+
           </div>
 
+
           <div className="about-card">
-            <h3>What’s Next?</h3>
+
+            <h3>
+              What’s Next?
+            </h3>
 
             <p>
-              Additional data fields will be added over time as new information is collected and fully reviewed. For questions or suggestions, please contact our principal investigator, John D. Graham, at <a href="mailto:grahamjd@iu.edu">grahamjd@iu.edu</a>.
+
+              Additional data fields will be added over time
+              as new information is collected and fully
+              reviewed.
+
+              For questions or suggestions, please contact
+              our principal investigator, John D. Graham, at{' '}
+
+              <a href="mailto:grahamjd@iu.edu">
+                grahamjd@iu.edu
+              </a>.
+
             </p>
+
           </div>
 
         </div>
 
+
+        {/* ====================================================
+            BUTTON THAT OPENS THE PROSPECTIVE STUDENT FORM
+        ==================================================== */}
+
         <div className="about-dataset-btn-wrapper">
+
           <a
             href="/DevCamp_new.xlsx"
-            download="DEV-CaMP-Dataset.xlsx"
             className="about-dataset-btn"
             onClick={handleDatasetClick}
           >
-            Download Dataset →
+            Request More Information →
           </a>
+
         </div>
 
       </section>
 
 
-      {/* Team Section */}
+
+      {/* ======================================================
+          TEAM SECTION
+      ====================================================== */}
+
       <section
         className="about-people-section"
         id="team"
       >
+
         <h2 className="about-people-title">
           Meet the Team
         </h2>
 
+
         <div className="people-row">
-          {teamMembers.slice(0, 4).map((person, index) => (
-            <div
-              key={index}
-              className="person-card"
-            >
-              <div className="person-photo-container">
 
-                <img
-                  src={person.image}
-                  alt={person.name}
-                  className="person-photo"
-                />
+          {teamMembers.slice(0, 4).map(
+            (person, index) => (
 
-                <a
-                  href={person.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="person-arrow-wrapper"
-                >
-                  <span className="arrow-icon">
-                    ↗
-                  </span>
+              <div
+                key={index}
+                className="person-card"
+              >
 
-                  <div className="arrow-tooltip">
-                    Click to view profile
-                  </div>
-                </a>
+                <div className="person-photo-container">
+
+                  <img
+                    src={person.image}
+                    alt={person.name}
+                    className="person-photo"
+                  />
+
+                  <a
+                    href={person.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="person-arrow-wrapper"
+                  >
+
+                    <span className="arrow-icon">
+                      ↗
+                    </span>
+
+                    <div className="arrow-tooltip">
+                      Click to view profile
+                    </div>
+
+                  </a>
+
+                </div>
+
+
+                <h3>
+                  {person.name}
+                </h3>
+
+                <p>
+                  {person.role}
+                </p>
 
               </div>
 
-              <h3>
-                {person.name}
-              </h3>
+            )
+          )}
 
-              <p>
-                {person.role}
-              </p>
-            </div>
-          ))}
         </div>
 
+
         <div className="people-row center-row">
-          {teamMembers.slice(4).map((person, index) => (
-            <div
-              key={index + 4}
-              className="person-card"
-            >
-              <div className="person-photo-container">
 
-                <img
-                  src={person.image}
-                  alt={person.name}
-                  className="person-photo"
-                />
+          {teamMembers.slice(4).map(
+            (person, index) => (
 
-                <a
-                  href={person.link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="person-arrow-wrapper"
-                >
-                  <span className="arrow-icon">
-                    ↗
-                  </span>
+              <div
+                key={index + 4}
+                className="person-card"
+              >
 
-                  <div className="arrow-tooltip">
-                    Click to view profile
-                  </div>
-                </a>
+                <div className="person-photo-container">
+
+                  <img
+                    src={person.image}
+                    alt={person.name}
+                    className="person-photo"
+                  />
+
+                  <a
+                    href={person.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="person-arrow-wrapper"
+                  >
+
+                    <span className="arrow-icon">
+                      ↗
+                    </span>
+
+                    <div className="arrow-tooltip">
+                      Click to view profile
+                    </div>
+
+                  </a>
+
+                </div>
+
+
+                <h3>
+                  {person.name}
+                </h3>
+
+                <p>
+                  {person.role}
+                </p>
 
               </div>
 
-              <h3>
-                {person.name}
-              </h3>
+            )
+          )}
 
-              <p>
-                {person.role}
-              </p>
-            </div>
-          ))}
         </div>
 
       </section>
 
 
-      {/* Glossary Section */}
+
+      {/* ======================================================
+          GLOSSARY SECTION
+      ====================================================== */}
+
       <section
         id="glossary"
         className="glossary-section"
         data-aos="fade-up"
       >
+
         <h2>
           User Guidance: Fields in DEV-CaMP
         </h2>
 
+
         <div className="glossary-grid custom-layout">
 
-          <div className="glossary-card">
-            <h4>Project Description</h4>
-            <p>Basic information about the project.</p>
-          </div>
 
           <div className="glossary-card">
-            <h4>Location Information</h4>
+
+            <h4>
+              Project Description
+            </h4>
+
             <p>
-              Includes state, county, and distance to nearest population center.
+              Basic information about the project.
             </p>
+
           </div>
 
+
           <div className="glossary-card">
-            <h4>Developer Description</h4>
+
+            <h4>
+              Location Information
+            </h4>
+
             <p>
-              Developer information including lead developer and commercial partnerships.
+              Includes state, county, and distance to nearest
+              population center.
             </p>
+
           </div>
 
+
           <div className="glossary-card">
-            <h4>Development Plans</h4>
+
+            <h4>
+              Developer Description
+            </h4>
+
             <p>
-              Includes information regarding plans for processing and the level of production.
+              Developer information including lead developer
+              and commercial partnerships.
             </p>
+
           </div>
 
+
           <div className="glossary-card">
-            <h4>Financial Support</h4>
+
+            <h4>
+              Development Plans
+            </h4>
+
             <p>
-              Supply agreements and federal or state grants/loans.
+              Includes information regarding plans for
+              processing and the level of production.
             </p>
+
           </div>
 
+
           <div className="glossary-card">
-            <h4>Land Ownership</h4>
+
+            <h4>
+              Financial Support
+            </h4>
+
+            <p>
+              Supply agreements and federal or state
+              grants/loans.
+            </p>
+
+          </div>
+
+
+          <div className="glossary-card">
+
+            <h4>
+              Land Ownership
+            </h4>
+
             <p>
               Public and private land information.
             </p>
+
           </div>
 
-          <div className="glossary-card empty"></div>
+
+          <div className="glossary-card empty">
+          </div>
+
 
           <div className="glossary-card">
-            <h4>Litigation Information</h4>
+
+            <h4>
+              Litigation Information
+            </h4>
+
             <p>
-              Includes information about lawsuits the project may be facing.
+              Includes information about lawsuits the project
+              may be facing.
             </p>
+
           </div>
 
-          <div className="glossary-card empty"></div>
+
+          <div className="glossary-card empty">
+          </div>
+
 
         </div>
 
+
         <div className="glossary-button-wrapper">
+
           <HashLink
             smooth
             to="/user-guide#user-guide-top"
@@ -506,28 +830,47 @@ const handleDatasetSubmit = async (e) => {
           >
             View Full User Guide →
           </HashLink>
+
         </div>
 
       </section>
 
 
-      {/* Footer / Contact Section */}
+
+      {/* ======================================================
+          FOOTER
+      ====================================================== */}
+
       <footer
         id="contact"
         className="site-footer"
         data-aos="fade-up"
       >
+
         <div className="footer-grid compact">
 
+
           <div className="footer-section brand">
-            <h3>DEV-CaMP</h3>
-            <p>Indiana University Bloomington</p>
+
+            <h3>
+              DEV-CaMP
+            </h3>
+
+            <p>
+              Indiana University Bloomington
+            </p>
+
           </div>
 
+
           <div className="footer-section links">
-            <h4>Quick Links</h4>
+
+            <h4>
+              Quick Links
+            </h4>
 
             <ul>
+
               <li>
                 <a href="/">
                   Home
@@ -551,18 +894,26 @@ const handleDatasetSubmit = async (e) => {
                   User Guide
                 </a>
               </li>
+
             </ul>
+
           </div>
 
+
           <div className="footer-section contact">
-            <h4>Contact</h4>
+
+            <h4>
+              Contact
+            </h4>
 
             <ul>
+
               <li>
                 Prof. John D. Graham — grahamjd@iu.edu
               </li>
 
               <li>
+
                 <a
                   href="https://oneill.indiana.edu/faculty-research/directory/profiles/faculty/full-time/graham-john.html"
                   target="_blank"
@@ -570,13 +921,18 @@ const handleDatasetSubmit = async (e) => {
                 >
                   John D. Graham Profile
                 </a>
+
               </li>
+
             </ul>
+
           </div>
 
         </div>
 
+
         <div className="footer-bottom">
+
           <p>
             © 2025 Indiana University Bloomington
           </p>
@@ -584,7 +940,9 @@ const handleDatasetSubmit = async (e) => {
           <p>
             Supported by the DEV-CaMP Research Group
           </p>
+
         </div>
+
 
         <a
           href="#top"
@@ -596,16 +954,23 @@ const handleDatasetSubmit = async (e) => {
       </footer>
 
 
-      {/* Dataset request modal */}
+
+      {/* ======================================================
+          PROSPECTIVE STUDENT FORM MODAL
+      ====================================================== */}
+
       {showDatasetForm && (
+
         <div
           className="dataset-modal-overlay"
           onClick={closeDatasetForm}
         >
+
           <div
             className="dataset-modal"
             onClick={(e) => e.stopPropagation()}
           >
+
 
             <button
               type="button"
@@ -616,22 +981,32 @@ const handleDatasetSubmit = async (e) => {
               ×
             </button>
 
+
             {!datasetSubmitted ? (
+
               <>
+
                 <h2>
-                  Download the DEV-CaMP Dataset
+                  Request More Information
                 </h2>
 
+
                 <p className="dataset-modal-description">
-                  Enter your details to download the current DEV-CaMP dataset.
+                  Tell us who you are and what you are
+                  interested in studying.
                 </p>
+
 
                 <form
                   className="dataset-request-form"
                   onSubmit={handleDatasetSubmit}
                 >
 
+
+                  {/* NAME */}
+
                   <div className="dataset-form-group">
+
                     <label htmlFor="dataset-name">
                       Name
                     </label>
@@ -644,12 +1019,18 @@ const handleDatasetSubmit = async (e) => {
                       onChange={handleDatasetInputChange}
                       required
                       autoComplete="name"
+                      placeholder="Your full name"
                     />
+
                   </div>
 
+
+                  {/* EMAIL */}
+
                   <div className="dataset-form-group">
+
                     <label htmlFor="dataset-email">
-                      Work / University Email
+                      Email
                     </label>
 
                     <input
@@ -660,37 +1041,54 @@ const handleDatasetSubmit = async (e) => {
                       onChange={handleDatasetInputChange}
                       required
                       autoComplete="email"
+                      placeholder="you@example.com"
                     />
+
                   </div>
 
+
+                  {/* INTENDED MAJOR */}
+
                   <div className="dataset-form-group">
-                    <label htmlFor="dataset-organization">
-                      Organization
-                      <span className="optional-label">
-                        (optional)
-                      </span>
+
+                    <label htmlFor="dataset-intended-major">
+                      Intended Major / Academic Interest
                     </label>
 
                     <input
-                      id="dataset-organization"
-                      name="organization"
+                      id="dataset-intended-major"
+                      name="intendedMajor"
                       type="text"
-                      value={datasetForm.organization}
+                      value={datasetForm.intendedMajor}
                       onChange={handleDatasetInputChange}
-                      autoComplete="organization"
+                      required
+                      placeholder="e.g. Data Science"
                     />
+
                   </div>
+
+
+                  {/* SUBMIT */}
 
                   <button
                     type="submit"
                     className="dataset-form-submit"
+                    disabled={isSubmitting}
                   >
-                    Submit & Download Dataset
+
+                    {isSubmitting
+                      ? 'Submitting...'
+                      : 'Submit'}
+
                   </button>
 
+
                 </form>
+
               </>
+
             ) : (
+
               <div className="dataset-success">
 
                 <h2>
@@ -698,7 +1096,7 @@ const handleDatasetSubmit = async (e) => {
                 </h2>
 
                 <p>
-                  Your dataset download has started.
+                  We received your information successfully.
                 </p>
 
                 <button
@@ -710,13 +1108,19 @@ const handleDatasetSubmit = async (e) => {
                 </button>
 
               </div>
+
             )}
 
+
           </div>
+
         </div>
+
       )}
 
+
     </div>
+
   );
 }
 

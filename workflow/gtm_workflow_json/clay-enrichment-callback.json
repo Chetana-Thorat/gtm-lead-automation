@@ -1,0 +1,45 @@
+{
+  "name": "clay-enrichment-callback",
+  "type": "workflow-reconstruction",
+  "source": "reconstructed from provided workflow screenshots and execution output",
+  "note": "Not an official n8n export. Use the actual n8n export as the source of truth for importing back into n8n.",
+  "trigger": {
+    "type": "webhook",
+    "method": "POST",
+    "path": "/webhook/clay-enrichment-callback"
+  },
+  "input_schema": {
+    "Name": "string",
+    "Email": "string",
+    "Organization": "string",
+    "Source": "string",
+    "Conversion": "string",
+    "Resource Name": "string",
+    "Domain": "string",
+    "Industry": "string",
+    "Address": "string"
+  },
+  "steps": [
+    {
+      "name": "Webhook",
+      "purpose": "Receive Clay enrichment callback"
+    },
+    {
+      "name": "JavaScript normalization",
+      "purpose": "Normalize enriched field names and values"
+    },
+    {
+      "name": "Scoring",
+      "purpose": "Apply ICP, enrichment, and intent scoring"
+    },
+    {
+      "name": "HubSpot update",
+      "purpose": "Persist enriched and scored lead data"
+    }
+  ],
+  "observed_enrichment_example": {
+    "Domain": "westernresearch.org",
+    "Industry": "Research Services",
+    "Address": "3474 N 3rd St, 3474 N. 3rd Street, Laramie, Wyoming 82072-6913, US"
+  }
+}
